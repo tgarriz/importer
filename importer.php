@@ -31,7 +31,8 @@
                         </fieldset>
                     </form>
                 </div>
-                <?php
+		<?php
+		   include 'config.php';
                    get_all_records();
                 ?>
             </div>
