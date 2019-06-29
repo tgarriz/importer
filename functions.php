@@ -23,7 +23,7 @@ if(isset($_POST["Import"])){
 	              window.location = \"importer.php\"
       	        </script>";    
 	      } else {
-      	        echo "<scr2yyipt type=\"text/javascript\">
+      	        echo "<script type=\"text/javascript\">
               	alert(\"CSV File has been successfully Imported.\");
 	            window.location = \"importer.php\"
       	        </script>";
@@ -36,6 +36,7 @@ if(isset($_POST["Import"])){
 }
 
 if(isset($_POST["Generar"])){
+	vaciar_dir();
 	$con = getdb();
 	$result = pg_query($con,'select distinct(nro_asiento) from asiento01');
 	/*echo var_dump($aux_asientos);
@@ -43,7 +44,7 @@ if(isset($_POST["Generar"])){
 	echo var_dump($asientos);*/
 	while($row = pg_fetch_assoc($result)) {
 			crea_encabezado($con,$row['nro_asiento']);
-//			crea_datos($row['nro_asiento']);
+			crea_datos($con,$row['nro_asiento']);
 	}
 	pg_close($con);
 }
@@ -59,12 +60,14 @@ function crea_encabezado($con,$asiento){
 			where nro_asiento = '$asiento' limit 1";
 	//echo $sql;
 	$result = pg_query($con,$sql);
+	$file = fopen("files/asiento-".$asiento."1.imp","w");
 	while($row = pg_fetch_assoc($result)) {
-		echo($row['campo']); 
+		fputs($file,$row['campo']."\r\n");
 	}
+	fclose($file);
 }
 
-function crea_datos($asiento){
+function crea_datos($con,$asiento){
 	$sql = "select  rpad(nro_asiento,6,' ') ||
 				rpad(replace(replace(cod_cta,'.',''),'/',''),15,' ') ||
 				regexp_replace(fecha, '/', '', 'g') ||
@@ -73,9 +76,9 @@ function crea_datos($asiento){
 				rpad(creaNumero(debe),15,' ') ||
 				rpad(' ',17,' ') ||
 				rpad(creaNumero(debe),15,' ') ||
-				regexp_replace(fecha, '/', '', 'g')
-			from asiento02
-			where haber = '' AND nro_asiento = "$asiento" 
+				regexp_replace(fecha, '/', '', 'g') as campo
+			from asiento01
+			where haber = '' AND nro_asiento = '$asiento' 
 			union
 			select  rpad(nro_asiento,6,' ') ||
 				rpad(replace(replace(cod_cta,'.',''),'/',''),15,' ') ||
@@ -85,13 +88,23 @@ function crea_datos($asiento){
 				rpad(creaNumero(haber),15,' ') ||
 				rpad(' ',17,' ') ||
 				rpad(creaNumero(haber),15,' ') ||
-				regexp_replace(fecha, '/', '', 'g')
-			from asiento02
-			where debe = '' AND nro_asiento = "$asiento;
+				regexp_replace(fecha, '/', '', 'g') as campo
+			from asiento01
+			where debe = '' AND nro_asiento = '$asiento'";
 
 	$result = pg_query($con,$sql);
-	echo 'Asiento N:';
-	echo var_dump($result);
-	pg_close($con);
+	$file = fopen("files/asiento-".$asiento."2.imp","w");
+	while($row = pg_fetch_assoc($result)) {
+		fputs($file,$row['campo']."\r\n");
+	}
+	fclose($file);
+}
+
+function vaciar_dir(){
+	$files = glob('files/*'); //obtenemos todos los nombres de los ficheros
+	foreach($files as $file){
+    	if(is_file($file))
+	    unlink($file); //elimino el fichero
+	}
 }
 ?>
