@@ -25,7 +25,10 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label" for="singlebutton">Import data</label>
                                 <div class="col-md-4">
-                                    <button type="submit" id="submit" name="Import" class="btn btn-primary button-loading" data-loading-text="Loading...">Importar!</button>
+                                    <button type="submit" id="submit_import" name="Import" class="btn btn-primary button-loading" data-loading-text="Loading...">Importar!</button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" id="submit_generar" name="Generar" class="btn btn-primary button-loading" data-loading-text="Loading...">Generar!</button>
                                 </div>
                             </div>
                         </fieldset>
