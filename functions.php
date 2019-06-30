@@ -76,7 +76,7 @@ function crea_datos($con,$asiento){
 				rpad(creaNumero(debe),15,' ') ||
 				regexp_replace(fecha, '/', '', 'g') as campo
 			from asiento01
-			where haber = '' AND nro_asiento = '$asiento' 
+			where debe != '' AND nro_asiento = '$asiento' 
 			union
 			select  rpad(nro_asiento,6,' ') ||
 				rpad(replace(replace(cod_cta,'.',''),'/',''),15,' ') ||
@@ -88,7 +88,7 @@ function crea_datos($con,$asiento){
 				rpad(creaNumero(haber),15,' ') ||
 				regexp_replace(fecha, '/', '', 'g') as campo
 			from asiento01
-			where debe = '' AND nro_asiento = '$asiento'";
+			where haber != '' AND nro_asiento = '$asiento'";
 
 	$result = pg_query($con,$sql);
 	$file = fopen("files/asiento-".$asiento."2.imp","w");
