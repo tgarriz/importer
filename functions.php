@@ -46,6 +46,8 @@ if(isset($_POST["Generar"])){
 			crea_encabezado($con,$row['nro_asiento']);
 			crea_datos($con,$row['nro_asiento']);
 	}
+	crea_zip();
+	enviar();
 	pg_close($con);
 }
 
@@ -106,5 +108,32 @@ function vaciar_dir(){
     	if(is_file($file))
 	    unlink($file); //elimino el fichero
 	}
+}
+
+function crea_zip(){
+	$zip = new ZipArchive();
+	$ret = $zip->open('files/asientos.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+	if ($ret !== TRUE) {
+    	printf('Erróneo con el código %d', $ret);
+	} else {
+    	$zip->addGlob('files/*.{imp}', GLOB_BRACE);
+	    $zip->close();
+	}
+}
+
+function enviar(){
+	$zipname = "asientos.zip";
+	$zippath = "files/asientos.zip";
+	header("Pragma: public");
+	header("Expires: 0");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header("Cache-Control: public");
+	header("Content-Description: File Transfer");
+	header("Content-type: application/octet-stream");
+	header('Content-Disposition: attachment; filename="'.$zipname.'"');
+	header("Content-Transfer-Encoding: binary");
+	header("Content-Length: ".filesize($zippath));
+	ob_end_flush();
+	@readfile($zippath);
 }
 ?>
