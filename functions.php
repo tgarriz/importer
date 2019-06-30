@@ -19,13 +19,13 @@ if(isset($_POST["Import"])){
               $result = pg_query($con, $sql);
           	if(!isset($result)) {
             		echo "<script type=\"text/javascript\">
-              	alert(\"Invalid File:Please Upload CSV File.\");
-	              window.location = \"importer.php\"
+              	alert(\"CSV Invalido.\");
+	              window.location = \"index.php\"
       	        </script>";    
 	      } else {
       	        echo "<script type=\"text/javascript\">
-              	alert(\"CSV File has been successfully Imported.\");
-	            window.location = \"importer.php\"
+              	alert(\"CSV Importado.\");
+	            window.location = \"index.php\"
       	        </script>";
            	}
          }
