@@ -2,33 +2,32 @@
 include 'config.php';
 
 if(isset($_POST["Import"])){
-	echo	($_POST["Import"]);
 	$con = getdb();
     $result = pg_query($con,'truncate asiento01');
 	if(!isset($result)) {
 		echo 'Error truncando table';
 	}
-    $filename=$_FILES["file"]["tmp_name"];    
-     if($_FILES["file"]["size"] > 0)
-       {
-          $file = fopen($filename, "r");
-            while (($getData = fgetcsv($file, 10000, ";")) !== FALSE)
-             {
-               $sql = "INSERT into asiento01 (nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber) 
-	      values ('".$getData[0]."','".$getData[1]."','".$getData[2]."','".$getData[3]."','".$getData[4]."','".$getData[5]."','".$getData[6]."','".$getData[7]."')";
+	$filename=$_FILES["file"]["tmp_name"];
+    revisacsv($filename);	
+     if($_FILES["file"]["size"] > 0) {
+			$file = fopen($filename, "r");
+			$reg = 0;
+			while (($getData = fgetcsv($file, 10000, ";")) !== FALSE){
+               $sql = "INSERT into asiento01 (id,nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber) 
+		  values ('".++$reg."','".$getData[0]."','".$getData[1]."','".$getData[2]."','".$getData[3]."','".$getData[4]."','".$getData[5]."','".$getData[6]."','".$getData[7]."')";
               $result = pg_query($con, $sql);
-          	if(!isset($result)) {
-            		echo "<script type=\"text/javascript\">
+          	  if(!isset($result)) {
+            	echo "<script type=\"text/javascript\">
               	alert(\"CSV Invalido.\");
-	              window.location = \"index.php\"
+	            window.location = \"index.php\"
       	        </script>";    
-	      } else {
+			  } else {
       	        echo "<script type=\"text/javascript\">
               	alert(\"CSV Importado.\");
 	            window.location = \"index.php\"
       	        </script>";
-           	}
-         }
+           	  }
+           }
           
 	    fclose($file);
 	 }
@@ -39,12 +38,9 @@ if(isset($_POST["Generar"])){
 	vaciar_dir();
 	$con = getdb();
 	$result = pg_query($con,'select distinct(nro_asiento) from asiento01');
-	/*echo var_dump($aux_asientos);
-	$asientos = pg_fetch_array($aux_asientos);
-	echo var_dump($asientos);*/
 	while($row = pg_fetch_assoc($result)) {
-			crea_encabezado($con,$row['nro_asiento']);
-			crea_datos($con,$row['nro_asiento']);
+		crea_encabezado($con,$row['nro_asiento']);
+		crea_datos($con,$row['nro_asiento']);
 	}
 	crea_zip();
 	enviar();
@@ -135,5 +131,25 @@ function enviar(){
 	header("Content-Length: ".filesize($zippath));
 	ob_end_flush();
 	@readfile($zippath);
+}
+
+function revisacsv($filename){
+	$file = fopen($filename, "r") or exit("No subio csv");
+	$nro_linea = 1;
+	$max = count(file($filename));
+	//echo "max es ".$max;
+	while(!feof($file) and $nro_linea<$max){
+		if(!revisaLinea(fgets($file))){
+			echo "Error en CSV, linea ".$nro_linea;
+			exit();	
+		}
+		$nro_linea++;
+
+	}
+	fclose($file);
+}
+
+function revisaLinea($line){
+	return (substr_count($line,';') == 7) ? true : false;
 }
 ?>

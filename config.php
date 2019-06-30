@@ -9,17 +9,20 @@ function get_all_records(){
         $result = pg_query($con, $Sql);  
         if (pg_num_rows($result) > 0) {
          echo "<div class='table-responsive'><table id='myTable' class='table table-striped table-bordered'>
-                 <thead><tr><th>NRO_ASIENTO</th>
-                              <th>FECHA</th>
-                              <th>CONCEPTO</th>
-                              <th>TIPO</th>
-                              <th>COD_CTA</th>
-                              <th>LEYENDA</th>
-                              <th>DEBE</th>
-                              <th>HABER</th>
-                            </tr></thead><tbody>";
+				 <thead><tr><th>REGISTRO</th>
+							<th>NRO_ASIENTO</th>
+                            <th>FECHA</th>
+                            <th>CONCEPTO</th>
+                            <th>TIPO</th>
+                            <th>COD_CTA</th>
+                            <th>LEYENDA</th>
+                            <th>DEBE</th>
+                            <th>HABER</th>
+                          </tr></thead><tbody>";
          while($row = pg_fetch_assoc($result)) {
-             echo "<tr><td>" . $row['nro_asiento']."</td>
+				 echo "<tr>
+						<td>" . $row['id']."</td>
+						<td>" . $row['nro_asiento']."</td>
                        <td>" . $row['fecha']."</td>
                        <td>" . $row['concepto']."</td>
                        <td>" . $row['tipo']."</td>
