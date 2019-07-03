@@ -12,13 +12,10 @@ if(isset($_POST["Import"])){
      if($_FILES["file"]["size"] > 0) {
 			$file = fopen($filename, "r");
 			$reg = 0;
-            $sql = "INSERT into asiento01 (id,nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber)
-					values ($1,$2,$3,$4,$5,$6,$7,$8,$9)";
-			$result = pg_prepare($con,"my_sql",$sql);
 			while (($getData = fgetcsv($file, 10000, ";")) !== FALSE){
-               //$sql = "INSERT into asiento01 (id,nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber) 
-		  //values ('".++$reg."','".$getData[0]."','".$getData[1]."','".$getData[2]."','".$getData[3]."','".$getData[4]."','".$getData[5]."','".$getData[6]."','".$getData[7]."')";
-              $result = pg_execute($con, "my_sql",array(++$reg,$getData[0],$getData[1],$getData[2],$getData[3],$getData[4],$getData[5],$getData[6],$getData[7]));
+               $sql = "INSERT into asiento01 (id,nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber) 
+		  values ('".++$reg."','".$getData[0]."','".$getData[1]."','".$getData[2]."','".$getData[3]."','".$getData[4]."','".$getData[5]."','".$getData[6]."','".$getData[7]."')";
+              $result = pg_query($con, $sql);
           	  if(!isset($result)) {
             	echo "<script type=\"text/javascript\">
               	alert(\"CSV Invalido.\");
