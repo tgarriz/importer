@@ -18,7 +18,7 @@ if(isset($_POST["Import"])){
 			while (($getData = fgetcsv($file, 10000, ";")) !== FALSE){
                //$sql = "INSERT into asiento01 (id,nro_asiento,fecha,concepto,tipo,cod_cta,leyenda,debe,haber) 
 		  //values ('".++$reg."','".$getData[0]."','".$getData[1]."','".$getData[2]."','".$getData[3]."','".$getData[4]."','".$getData[5]."','".$getData[6]."','".$getData[7]."')";
-              $result = pg_execute($con, "my_sql",array(++$reg,$getData[0],$getData[1],$getData[2],$getData[3],$getData[4],$getData[5],$getData[6],$getData[7]));
+              $result = pg_execute($con, "my_sql",array(++$reg,$getData[0],$getData[1],$getData[2],$getData[3],$getData[4],preg_replace('/[^A-Za-z0-9\-]/', '',$getData[5]),$getData[6],$getData[7]));
           	  if(!isset($result)) {
             	echo "<script type=\"text/javascript\">
               	alert(\"CSV Invalido.\");
@@ -59,7 +59,6 @@ function crea_encabezado($con,$asiento){
 				'   ' as campo	
 			from asiento01
 			where nro_asiento = '$asiento' limit 1";
-	//echo $sql;
 	$result = pg_query($con,$sql);
 	$file = fopen("files/asiento-".$asiento."1.imp","w");
 	while($row = pg_fetch_assoc($result)) {
@@ -113,7 +112,7 @@ function crea_zip(){
 	$zip = new ZipArchive();
 	$ret = $zip->open('files/asientos.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
 	if ($ret !== TRUE) {
-    	printf('Erróneo con el código %d', $ret);
+    	printf('Error con el código %d', $ret);
 	} else {
     	$zip->addGlob('files/*.{imp}', GLOB_BRACE);
 	    $zip->close();
